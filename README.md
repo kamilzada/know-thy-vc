@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Know Thy VC
 
-## Getting Started
+*Know thy VC. Walk in prepared.*
 
-First, run the development server:
+Enter an investor's name and firm and get a sourced pre-meeting brief in under two minutes: recent portfolio activity (last 90 days), investment thesis, context and red flags, and three talking points tailored to your startup. Every claim links to its source.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Built for MESA C4, AI & its Applications, Section 1 Final (Problem Statement 1, Medium). Gemini Flash is the only AI model used.
+
+## How it works
+
+```
+POST /api/brief {investor, firm, profile?}   → streams progress as server-sent events
+  1. Cache        Supabase: same investor + firm in the last 24h → return it
+  2. Resolve      Gemini Flash + Google Search grounding → confirms the person at the firm
+  3. Research     in parallel, 15s budget each:
+                    Portfolio (Tavily news, 90 days) · Thesis (Tavily) · Context (Tavily) · Grounded overview (Gemini)
+  4. Synthesize   one Gemini Flash call with a JSON schema; claims cite numbered sources (S1…), never raw URLs
+  5. Validate     code, no LLM: drops claims citing unknown sources, drops quotes not found verbatim,
+                  splits deals at 90 days, sorts red flags first, assigns confidence per section
+  6. Save         Supabase `briefs`
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| File | Role |
+|---|---|
+| `app/api/brief/route.ts` | Orchestrator (SSE stream) |
+| `lib/agents/resolveEntity.ts` | Entity resolver |
+| `lib/agents/research.ts` | Parallel research agents |
+| `lib/agents/synthesize.ts` | Single synthesis call and schema |
+| `lib/validate.ts` | Citation, recency and confidence checks |
+| `lib/gemini.ts`, `lib/tavily.ts` | API wrappers |
+| `lib/supabase.ts` | Cache and history |
+| `lib/startupProfile.ts` | Default startup profile |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+cp .env.example .env.local   # add your keys
+npm run dev
+npm test                     # validator and input tests
+```
 
-## Learn More
+Run `supabase/migrations/001_init.sql` in the Supabase SQL editor. Supabase is optional: without it, briefs aren't cached or saved.
 
-To learn more about Next.js, take a look at the following resources:
+| Env var | Required |
+|---|---|
+| `GEMINI_API_KEY` | yes |
+| `TAVILY_API_KEY` | yes (without it the brief falls back to Google-grounded data only) |
+| `GEMINI_MODEL` | no, defaults to `gemini-flash-latest` |
+| `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | for cache and history |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**LinkedIn:** LinkedIn can't be scraped. Public posts only show up through search snippets.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `docs/investor-brief-plan.md` and `docs/design-system.md` for the full plan.
