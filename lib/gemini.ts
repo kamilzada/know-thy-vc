@@ -17,24 +17,53 @@ function gemini() {
   return client;
 }
 
-function shouldTryNextModel(err: unknown) {
+/**
+ * Short-term memory of what's down, per warm server instance, so one brief's failures
+ * don't make the next brief waste requests on the same dead ends.
+ */
+const modelCooldownUntil = new Map<string, number>();
+let groundingBlockedUntil = 0;
+const MODEL_COOLDOWN_MS = 60_000;
+const RETIRED_COOLDOWN_MS = 60 * 60_000;
+const GROUNDING_COOLDOWN_MS = 10 * 60_000;
+
+function errorInfo(err: unknown) {
   const status = (err as { status?: number })?.status;
   const message = err instanceof Error ? err.message : String(err);
-  return (
-    status === 503 || status === 404 || status === 429 ||
-    /UNAVAILABLE|high demand|overloaded|no longer available|not found|RESOURCE_EXHAUSTED/i.test(message)
-  );
+  return {
+    retired: status === 404 || /no longer available|not found/i.test(message),
+    busy: status === 503 || status === 429 || /UNAVAILABLE|high demand|overloaded|RESOURCE_EXHAUSTED/i.test(message),
+    quota: /exceeded your current quota/i.test(message),
+  };
 }
 
-async function generate(params: Omit<GenerateContentParameters, "model">): Promise<GenerateContentResponse> {
+/** Models not cooling down, preferred first. If all are cooling, try the one that recovers soonest. */
+function availableModels() {
+  const now = Date.now();
+  const ready = MODEL_CHAIN.filter((m) => (modelCooldownUntil.get(m) ?? 0) <= now);
+  if (ready.length) return ready;
+  return [...MODEL_CHAIN].sort((a, b) => (modelCooldownUntil.get(a) ?? 0) - (modelCooldownUntil.get(b) ?? 0)).slice(0, 1);
+}
+
+async function generate(
+  params: Omit<GenerateContentParameters, "model">,
+  opts: { grounded?: boolean } = {},
+): Promise<GenerateContentResponse> {
   let lastError: unknown;
-  for (const model of MODEL_CHAIN) {
+  for (const model of availableModels()) {
     if (params.config?.abortSignal?.aborted) break;
     try {
       return await gemini().models.generateContent({ ...params, model });
     } catch (err) {
       lastError = err;
-      if (!shouldTryNextModel(err)) break;
+      const info = errorInfo(err);
+      // A grounding quota error is project-wide, so other models won't help.
+      if (opts.grounded && info.quota) {
+        groundingBlockedUntil = Date.now() + GROUNDING_COOLDOWN_MS;
+        break;
+      }
+      if (!info.retired && !info.busy) break;
+      modelCooldownUntil.set(model, Date.now() + (info.retired ? RETIRED_COOLDOWN_MS : MODEL_COOLDOWN_MS));
       console.warn(`[Gemini] ${model} unavailable, trying the next Flash model`);
     }
   }
@@ -48,10 +77,13 @@ export type GroundedResult = {
 
 /** Asks Gemini with the Google Search tool switched on and returns its answer plus the pages it used. */
 export async function groundedSearch(prompt: string, signal?: AbortSignal): Promise<GroundedResult> {
-  const res = await generate({
-    contents: prompt,
-    config: { tools: [{ googleSearch: {} }], temperature: 0.2, abortSignal: signal },
-  });
+  if (Date.now() < groundingBlockedUntil) {
+    throw new BriefError("rate_limited", "Google Search grounding is unavailable on this Gemini key right now.");
+  }
+  const res = await generate(
+    { contents: prompt, config: { tools: [{ googleSearch: {} }], temperature: 0.2, abortSignal: signal } },
+    { grounded: true },
+  );
   const chunks = res.candidates?.[0]?.groundingMetadata?.groundingChunks ?? [];
   const seen = new Set<string>();
   const sources = chunks
