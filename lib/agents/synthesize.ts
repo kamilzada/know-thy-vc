@@ -91,7 +91,7 @@ const SCHEMA = {
         required: ["opener", "why", "evidenceSourceId"],
       },
     },
-    notes: { ...strArr, description: "caveats, e.g. name ambiguity or thin data" },
+    notes: { ...strArr, maxItems: 2, description: "at most 2 caveats that change how the founder should read the brief, e.g. conflicting sources or uncertain dates. Never describe irrelevant search results." },
   },
   required: ["portfolioActivity", "thesis", "context", "talkingPoints", "notes"],
 };
