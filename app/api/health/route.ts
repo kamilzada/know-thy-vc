@@ -1,4 +1,4 @@
-import { GEMINI_MODEL, groundedSearch } from "@/lib/gemini";
+import { GEMINI_MODEL } from "@/lib/gemini";
 import { GoogleGenAI } from "@google/genai";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
@@ -23,10 +23,11 @@ export async function GET(request: Request) {
       return { ok: false, ms: Date.now() - started, error: (err instanceof Error ? err.message : String(err)).slice(0, 300) };
     }
   };
+  const model = new URL(request.url).searchParams.get("model") || GEMINI_MODEL;
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
   const [plain, grounded] = await Promise.all([
-    probe(() => ai.models.generateContent({ model: GEMINI_MODEL, contents: "Reply with ok." })),
-    probe(() => groundedSearch("Name one partner at Blume Ventures. One line.")),
+    probe(() => ai.models.generateContent({ model, contents: "Reply with ok." })),
+    probe(() => ai.models.generateContent({ model, contents: "Name one partner at Blume Ventures. One line.", config: { tools: [{ googleSearch: {} }] } })),
   ]);
-  return Response.json({ config, probe: { plain, grounded } });
+  return Response.json({ config, model, probe: { plain, grounded } });
 }
