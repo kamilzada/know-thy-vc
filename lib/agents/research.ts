@@ -5,6 +5,8 @@ import type { Entity, Section, SourceRef } from "../types";
 
 /** Each agent gets this long before its section is marked low confidence (plan §8). */
 export const AGENT_TIMEOUT_MS = 15_000;
+/** The web-grounded overview reads pages before answering, so it gets longer. It runs alongside the others. */
+export const OVERVIEW_TIMEOUT_MS = 25_000;
 export const RECENT_DAYS = 90;
 
 export type AgentResult = {
@@ -69,7 +71,7 @@ async function tavilyAgent(section: Section, entity: Entity): Promise<AgentResul
 
 async function overviewAgent(entity: Entity): Promise<AgentResult> {
   try {
-    const { text, sources } = await withTimeout(AGENT_TIMEOUT_MS, (signal) =>
+    const { text, sources } = await withTimeout(OVERVIEW_TIMEOUT_MS, (signal) =>
       groundedSearch(
         `Give a factual briefing on ${entity.fullName}${entity.role ? `, ${entity.role}` : ""} at ${entity.firm}:
 1) investments or exits they or ${entity.firm} announced in the last ${RECENT_DAYS} days (company, round, amount, date);

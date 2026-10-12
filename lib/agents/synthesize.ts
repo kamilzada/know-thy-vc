@@ -129,8 +129,8 @@ ${entity.disambiguation ? `Identity note: ${entity.disambiguation}\n` : ""}
 FOUNDER'S STARTUP: ${profile.name}: ${profile.oneLiner}
 Sector: ${profile.sector} · Stage: ${profile.stage} · Raising: ${profile.raiseAmount} · Traction: ${profile.traction}
 
-GROUNDED OVERVIEW (Google Search; cite its facts with one of ${overviewIds.join(", ") || "no IDs: do not use it"}):
-${overview?.trim() || "(unavailable)"}
+WEB OVERVIEW (live web search; cite its facts with one of ${overviewIds.join(", ") || "no IDs: do not use it"}):
+${overview?.trim() || "(not available for this brief; do not mention it in notes)"}
 
 SOURCES:
 ${sourceList || "(none)"}

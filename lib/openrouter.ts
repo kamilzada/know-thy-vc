@@ -55,7 +55,14 @@ export async function openRouterChat(opts: {
     throw toBriefError(err, "Gemini (via OpenRouter)");
   }
 
-  const body = (await res.json().catch(() => null)) as {
+  let raw: unknown;
+  try {
+    raw = await res.json();
+  } catch (err) {
+    // An abort while the body is still streaming in is a timeout, not a bad response.
+    throw toBriefError(opts.signal?.aborted ? Object.assign(new Error("aborted"), { name: "AbortError" }) : err, "Gemini (via OpenRouter)");
+  }
+  const body = raw as {
     model?: string;
     error?: { message?: string; code?: number };
     choices?: { message?: { content?: string; annotations?: Annotation[] } }[];

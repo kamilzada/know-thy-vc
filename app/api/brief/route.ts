@@ -42,8 +42,13 @@ export async function POST(request: Request) {
           open = false; // client went away
         }
       };
-      const step = (s: StepId, status: "active" | "done" | "low" | "error", detail?: string) =>
-        send({ type: "step", step: s, status, detail });
+      const stepStarted = new Map<StepId, number>();
+      const step = (s: StepId, status: "active" | "done" | "low" | "error", detail?: string) => {
+        if (status === "active") stepStarted.set(s, Date.now());
+        const started = stepStarted.get(s);
+        const ms = status !== "active" && started ? Date.now() - started : undefined;
+        send({ type: "step", step: s, status, detail, ms });
+      };
 
       const startedAt = Date.now();
       try {

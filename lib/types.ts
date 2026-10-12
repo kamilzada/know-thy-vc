@@ -72,7 +72,7 @@ export type StepStatus = "active" | "done" | "low" | "error";
 
 /** Server-sent events emitted by /api/brief. */
 export type BriefEvent =
-  | { type: "step"; step: StepId; status: StepStatus; detail?: string }
+  | { type: "step"; step: StepId; status: StepStatus; detail?: string; ms?: number }
   | { type: "resolved"; entity: Entity }
   | { type: "brief"; brief: Brief; cached: boolean; durationMs: number; id?: string }
   | { type: "error"; code: ErrorCode; message: string; suggestions?: string[] };

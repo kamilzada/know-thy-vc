@@ -21,17 +21,18 @@ const RULES = (investor: string, firm: string) => `Rules:
 - Never invent URLs. Leave a field empty if you are not sure.`;
 
 /**
- * Step 2: confirm the person exists at that firm. Gemini with Google Search grounding first;
- * if grounding is unavailable (quota, outage), Tavily results judged by Gemini instead.
+ * Step 2: confirm the person exists at that firm. Tavily results judged by Gemini Flash first
+ * (fast, and every URL can be checked); web-grounded Gemini if Tavily is missing or fails.
  * The firm is the tie-breaker when the name is common (edge case 3).
  */
 export async function resolveEntity(investor: string, firm: string, signal?: AbortSignal): Promise<Entity> {
+  if (!process.env.TAVILY_API_KEY) return resolveWithGrounding(investor, firm, signal);
   try {
-    return await resolveWithGrounding(investor, firm, signal);
+    return await resolveWithTavily(investor, firm, signal);
   } catch (err) {
-    if (!process.env.TAVILY_API_KEY || !(err instanceof BriefError) || err.code === "missing_config") throw err;
-    console.warn("[resolver] grounding unavailable, falling back to Tavily:", err.message);
-    return resolveWithTavily(investor, firm, signal);
+    if (!(err instanceof BriefError) || signal?.aborted) throw err;
+    console.warn("[resolver] Tavily path failed, falling back to grounded search:", err.message);
+    return resolveWithGrounding(investor, firm, signal);
   }
 }
 

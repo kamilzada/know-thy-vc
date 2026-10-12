@@ -123,7 +123,7 @@ export function validateBrief(opts: {
     if (a.ok) continue;
     notes.push(
       name === "overview"
-        ? "Google Search overview was unavailable, so this brief is built from Tavily search results only."
+        ? "The live web overview was unavailable, so this brief is built from Tavily search results only."
         : `${cap(name)} search was unavailable (${shortReason(a.error)}), so that section has less data.`,
     );
   }
