@@ -27,6 +27,7 @@ export function toBriefError(err: unknown, service: string): BriefError {
   if (err instanceof BriefError) return err;
   const message = err instanceof Error ? err.message : String(err);
   const status = (err as { status?: number })?.status;
+  console.error(`[${service}] ${status ?? ""} ${message.slice(0, 500)}`);
   if (status === 429 || /429|rate limit|quota|RESOURCE_EXHAUSTED/i.test(message)) {
     return new BriefError("rate_limited", `${service} is rate limiting us right now. Wait a minute and try again.`);
   }
