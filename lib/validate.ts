@@ -105,14 +105,27 @@ export function validateBrief(opts: {
     })
     .slice(0, 3);
 
-  const notes = arr(draft.notes).filter((n) => typeof n === "string" && n.trim());
+  // Notes are model-written: swap internal IDs like "S14" for the source's site name.
+  const notes = arr(draft.notes)
+    .filter((n) => typeof n === "string" && n.trim())
+    .map((n) =>
+      n.replace(/\b(?:source\s+)?\[?([SR]\d+)\]?/gi, (match, id: string) => {
+        const src = byId.get(id.toUpperCase());
+        return src ? `the ${domain(src.url)} report` : match;
+      }),
+    );
   if (entity.disambiguation) notes.unshift(entity.disambiguation);
   if (recent.length === 0) notes.push(`No public deals found in the last ${RECENT_DAYS} days.`);
   if (talkingPoints.length < 3) {
     notes.push(`Only ${talkingPoints.length} of 3 talking points could be backed by a source, so the rest were left out.`);
   }
   for (const [name, a] of Object.entries(agents)) {
-    if (!a.ok) notes.push(`${cap(name)} search failed (${a.error ?? "unknown error"}), so that section has less data.`);
+    if (a.ok) continue;
+    notes.push(
+      name === "overview"
+        ? "Google Search overview was unavailable, so this brief is built from Tavily search results only."
+        : `${cap(name)} search was unavailable (${shortReason(a.error)}), so that section has less data.`,
+    );
   }
 
   const confidence: Record<Section, Confidence> = {
@@ -138,7 +151,8 @@ export function validateBrief(opts: {
         : "Not enough public material was found to describe this investor's thesis with confidence.",
       sectors: hasThesisEvidence ? strings(draft.thesis?.sectors) : [],
       stages: hasThesisEvidence ? strings(draft.thesis?.stages) : [],
-      checkSize: hasThesisEvidence ? blank(draft.thesis?.checkSize) : undefined,
+      // A cheque size needs a number in it; "seed to Series A" is a stage, not a size.
+      checkSize: hasThesisEvidence && /\d/.test(draft.thesis?.checkSize ?? "") ? blank(draft.thesis?.checkSize) : undefined,
       quotes,
       sourceUrls: thesisIds.map((s) => s.url),
     },
@@ -175,6 +189,22 @@ function strings(value: unknown): string[] {
 
 function blank(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function domain(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^(www|m)\./, "");
+  } catch {
+    return "source";
+  }
+}
+
+function shortReason(error?: string) {
+  if (!error) return "unknown error";
+  if (/timed out|took too long/i.test(error)) return "timed out";
+  if (/quota|rate limit/i.test(error)) return "rate limited";
+  if (/isn't configured|rejected the API key/i.test(error)) return "not configured";
+  return "service error";
 }
 
 function cap(s: string) {

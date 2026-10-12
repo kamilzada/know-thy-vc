@@ -115,7 +115,7 @@ describe("validateBrief", () => {
       agents: { ...agents, context: { agent: "context", ok: false, error: "timed out", sources: [] } },
     });
     assert.equal(brief.confidence.context, "low");
-    assert.ok(brief.notes.some((n) => n.startsWith("Context search failed (timed out)")));
+    assert.ok(brief.notes.some((n) => n.startsWith("Context search was unavailable (timed out)")));
   });
 
   it("replaces an uncited thesis with an honest message", () => {

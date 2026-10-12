@@ -52,7 +52,7 @@ const SCHEMA = {
         summary: { type: "string", description: "2-3 plain sentences" },
         sectors: strArr,
         stages: strArr,
-        checkSize: str,
+        checkSize: { type: "string", description: "typical cheque size as an amount or range, e.g. $1-3M. Omit if not stated." },
         quotes: {
           type: "array",
           items: {
