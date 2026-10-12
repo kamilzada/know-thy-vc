@@ -83,7 +83,7 @@ Today is ${new Date().toISOString().slice(0, 10)}. Include dates. Say "not found
       agent: "overview",
       ok: true,
       summary: text,
-      sources: sources.map((s) => ({ url: s.url, title: s.title, snippet: "", section: "overview" as const })),
+      sources: sources.map((s) => ({ url: s.url, title: s.title, snippet: s.snippet ?? "", section: "overview" as const })),
     };
   } catch (err) {
     return { agent: "overview", ok: false, error: reason(err), sources: [] };

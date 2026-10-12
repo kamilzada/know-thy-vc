@@ -1,5 +1,6 @@
 import { GoogleGenAI, type GenerateContentParameters, type GenerateContentResponse } from "@google/genai";
 import { BriefError, requireEnv, toBriefError } from "./errors";
+import { isOpenRouterConfigured, openRouterChat } from "./openrouter";
 
 /** Gemini Flash only (assignment constraint). */
 export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
@@ -72,11 +73,20 @@ async function generate(
 
 export type GroundedResult = {
   text: string;
-  sources: { url: string; title: string }[];
+  sources: { url: string; title: string; snippet?: string }[];
 };
+
+/** Which path Gemini Flash calls take: OpenRouter when its key is set, otherwise Google directly. */
+export function geminiProvider() {
+  return isOpenRouterConfigured() ? "openrouter" : "google";
+}
 
 /** Asks Gemini with the Google Search tool switched on and returns its answer plus the pages it used. */
 export async function groundedSearch(prompt: string, signal?: AbortSignal): Promise<GroundedResult> {
+  if (isOpenRouterConfigured()) {
+    const { text, sources } = await openRouterChat({ prompt, web: true, signal });
+    return { text, sources };
+  }
   if (Date.now() < groundingBlockedUntil) {
     throw new BriefError("rate_limited", "Google Search grounding is unavailable on this Gemini key right now.");
   }
@@ -92,7 +102,7 @@ export async function groundedSearch(prompt: string, signal?: AbortSignal): Prom
   return { text: res.text ?? "", sources };
 }
 
-/** Calls Gemini with a JSON schema. Retries once if the output doesn't parse, then gives up politely. */
+/** Calls Gemini Flash with a JSON schema. Retries once if the output doesn't parse, then gives up politely. */
 export async function generateJson<T>(opts: {
   system: string;
   prompt: string;
@@ -101,8 +111,18 @@ export async function generateJson<T>(opts: {
 }): Promise<T> {
   let lastError = "";
   for (let attempt = 0; attempt < 2; attempt++) {
+    const prompt = attempt === 0 ? opts.prompt : `${opts.prompt}\n\nYour previous reply was not valid JSON (${lastError}). Reply with JSON only.`;
+    if (isOpenRouterConfigured()) {
+      const { text } = await openRouterChat({ system: opts.system, prompt, schema: opts.schema, signal: opts.signal });
+      try {
+        return JSON.parse(stripFence(text)) as T;
+      } catch (err) {
+        lastError = err instanceof Error ? err.message : "parse error";
+        continue;
+      }
+    }
     const res = await generate({
-      contents: attempt === 0 ? opts.prompt : `${opts.prompt}\n\nYour previous reply was not valid JSON (${lastError}). Reply with JSON only.`,
+      contents: prompt,
       config: {
         systemInstruction: opts.system,
         responseMimeType: "application/json",
@@ -118,6 +138,10 @@ export async function generateJson<T>(opts: {
     }
   }
   throw new BriefError("bad_model_output", "Gemini returned a malformed brief twice in a row. Please try again.");
+}
+
+function stripFence(text: string) {
+  return text.replace(/^\s*```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "");
 }
 
 /** Pulls the first JSON object out of free text (grounded calls can't use a response schema). */

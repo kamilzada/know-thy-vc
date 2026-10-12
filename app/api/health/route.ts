@@ -1,12 +1,13 @@
-import { GEMINI_MODEL } from "@/lib/gemini";
-import { GoogleGenAI } from "@google/genai";
+import { GEMINI_MODEL, generateJson, geminiProvider, groundedSearch } from "@/lib/gemini";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
-/** Reports which services are configured. With ?probe=1 it also makes two tiny Gemini calls. */
+/** Reports which services are configured. With ?probe=1 it also makes two tiny Gemini Flash calls. */
 export async function GET(request: Request) {
+  const provider = geminiProvider();
   const config = {
-    model: GEMINI_MODEL,
-    gemini: Boolean(process.env.GEMINI_API_KEY),
+    provider,
+    model: provider === "openrouter" ? process.env.OPENROUTER_MODELS || "google/gemini-3.8-flash (+ Flash fallbacks)" : GEMINI_MODEL,
+    gemini: provider === "openrouter" || Boolean(process.env.GEMINI_API_KEY),
     tavily: Boolean(process.env.TAVILY_API_KEY),
     supabase: isSupabaseConfigured(),
   };
@@ -17,17 +18,21 @@ export async function GET(request: Request) {
   const probe = async (run: () => Promise<unknown>) => {
     const started = Date.now();
     try {
-      await run();
-      return { ok: true, ms: Date.now() - started };
+      const detail = await run();
+      return { ok: true, ms: Date.now() - started, detail };
     } catch (err) {
       return { ok: false, ms: Date.now() - started, error: (err instanceof Error ? err.message : String(err)).slice(0, 300) };
     }
   };
-  const model = new URL(request.url).searchParams.get("model") || GEMINI_MODEL;
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
-  const [plain, grounded] = await Promise.all([
-    probe(() => ai.models.generateContent({ model, contents: "Reply with ok." })),
-    probe(() => ai.models.generateContent({ model, contents: "Name one partner at Blume Ventures. One line.", config: { tools: [{ googleSearch: {} }] } })),
+  const [json, search] = await Promise.all([
+    probe(() =>
+      generateJson<{ ok: boolean }>({
+        system: "Reply with JSON.",
+        prompt: 'Return {"ok": true}.',
+        schema: { type: "object", properties: { ok: { type: "boolean" } }, required: ["ok"] },
+      }),
+    ),
+    probe(async () => (await groundedSearch("Name one partner at Blume Ventures. One line.")).sources.length + " sources"),
   ]);
-  return Response.json({ config, model, probe: { plain, grounded } });
+  return Response.json({ config, probe: { json, search } });
 }

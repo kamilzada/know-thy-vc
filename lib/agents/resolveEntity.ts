@@ -49,7 +49,7 @@ Reply with ONLY a JSON object in a \`\`\`json block with these keys:
     extractJsonObject<ResolverJson>(text) ?? {},
     investor,
     firm,
-    sources.slice(0, 5).map((s, i) => ({ id: `R${i + 1}`, url: s.url, title: s.title, snippet: "", section: "resolver" as const })),
+    sources.slice(0, 5).map((s, i) => ({ id: `R${i + 1}`, url: s.url, title: s.title, snippet: s.snippet ?? "", section: "resolver" as const })),
   );
 }
 
