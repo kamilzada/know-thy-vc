@@ -1,9 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TriangleAlert } from "lucide-react";
 
-/** Rotating dashed ring, two bobbing mini-cards, dot grid, accent corner block and a soft glow. Decorative. */
+/** Rotating dashed ring, a bobbing mini-card, dot grid, accent corner block and a soft glow. Decorative. */
 export function HeroGraphic() {
   return (
     <div aria-hidden className="relative mx-auto aspect-square w-full max-w-[460px]">
@@ -36,14 +35,6 @@ export function HeroGraphic() {
         <p className="mt-1 text-sm font-semibold">Led Seed · 14 days ago</p>
       </motion.div>
 
-      <motion.div
-        className="absolute bottom-[18%] right-[-2%] flex items-center gap-2 rounded-2xl border border-border bg-card px-4 py-3 shadow-[var(--shadow-lg)]"
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <TriangleAlert className="h-4 w-4 text-danger" />
-        <span className="rounded-full bg-danger/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.1em] text-danger">Red flag</span>
-      </motion.div>
     </div>
   );
 }
