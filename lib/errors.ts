@@ -28,6 +28,9 @@ export function toBriefError(err: unknown, service: string): BriefError {
   const message = err instanceof Error ? err.message : String(err);
   const status = (err as { status?: number })?.status;
   console.error(`[${service}] ${status ?? ""} ${message.slice(0, 500)}`);
+  if (/exceeded your current quota/i.test(message)) {
+    return new BriefError("rate_limited", `${service} quota for this API key is used up or not enabled. Check the plan and billing for the key's project.`);
+  }
   if (status === 429 || /429|rate limit|quota|RESOURCE_EXHAUSTED/i.test(message)) {
     return new BriefError("rate_limited", `${service} is rate limiting us right now. Wait a minute and try again.`);
   }
