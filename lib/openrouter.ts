@@ -47,7 +47,7 @@ export async function openRouterChat(opts: {
         ...(opts.schema
           ? { response_format: { type: "json_schema", json_schema: { name: "result", strict: false, schema: opts.schema } } }
           : {}),
-        ...(opts.web ? { plugins: [{ id: "web", max_results: 8 }] } : {}),
+        ...(opts.web ? { plugins: [{ id: "web", engine: "exa", max_results: 8 }] } : {}),
       }),
       signal: opts.signal,
     });
