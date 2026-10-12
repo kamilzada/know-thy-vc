@@ -1,18 +1,11 @@
 "use client";
 
 import { CircleAlert, RotateCw } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { BriefHeader } from "@/components/brief/BriefHeader";
-import { ContextList } from "@/components/brief/ContextList";
-import { FitCard } from "@/components/brief/FitCard";
-import { PortfolioGrid } from "@/components/brief/PortfolioGrid";
-import { SourcesList } from "@/components/brief/SourcesList";
-import { StatsStrip } from "@/components/brief/StatsStrip";
-import { TalkingPoints } from "@/components/brief/TalkingPoints";
-import { ThesisSection } from "@/components/brief/ThesisSection";
+import { useEffect, useRef, useState } from "react";
+import { BriefView } from "@/components/brief/BriefView";
 import { BriefForm } from "@/components/hero/BriefForm";
 import { HeroGraphic } from "@/components/hero/HeroGraphic";
-import { StartupPanel } from "@/components/hero/StartupPanel";
+import { StartupCard, type ProfileStatus } from "@/components/hero/StartupCard";
 import { Reveal } from "@/components/motion/Reveal";
 import { ElapsedTimer } from "@/components/progress/ElapsedTimer";
 import { ProgressTimeline } from "@/components/progress/ProgressTimeline";
@@ -20,41 +13,32 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { GradientText } from "@/components/ui/GradientText";
 import { SectionLabel } from "@/components/ui/SectionLabel";
-import { computeFit } from "@/lib/fit";
 import { hasErrors, validateInputs, type InputErrors } from "@/lib/input";
-import { briefToMarkdown } from "@/lib/markdown";
 import { DEFAULT_STARTUP_PROFILE, sanitizeProfile } from "@/lib/startupProfile";
 import type { StartupProfile } from "@/lib/types";
 import { useBriefStream } from "@/lib/useBriefStream";
 
 const PROFILE_KEY = "ktvc-startup-profile";
-const PROFILE_EVENT = "ktvc-profile-change";
 
-/** The saved profile lives in browser storage; read it as an external store so SSR and hydration agree. */
-function subscribeProfile(onChange: () => void) {
-  window.addEventListener("storage", onChange);
-  window.addEventListener(PROFILE_EVENT, onChange);
-  return () => {
-    window.removeEventListener("storage", onChange);
-    window.removeEventListener(PROFILE_EVENT, onChange);
-  };
-}
-
-function readProfileRaw(): string | null {
+function readLocalProfile(): StartupProfile | null {
   try {
-    return localStorage.getItem(PROFILE_KEY);
+    const raw = localStorage.getItem(PROFILE_KEY);
+    return raw ? sanitizeProfile(JSON.parse(raw)) : null;
   } catch {
     return null;
   }
 }
 
-function parseProfile(raw: string | null): StartupProfile {
+function writeLocalProfile(profile: StartupProfile) {
   try {
-    return raw ? sanitizeProfile(JSON.parse(raw)) : DEFAULT_STARTUP_PROFILE;
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+    return true;
   } catch {
-    return DEFAULT_STARTUP_PROFILE;
+    return false;
   }
 }
+
+const sameProfile = (a: StartupProfile, b: StartupProfile) => JSON.stringify(a) === JSON.stringify(b);
 
 /** "Rahul Dash at Blume Ventures" → ["Rahul Dash", "Blume Ventures"] */
 function splitSuggestion(s: string): [string, string] | null {
@@ -66,13 +50,39 @@ export function BriefApp() {
   const [investor, setInvestor] = useState("");
   const [firm, setFirm] = useState("");
   const [errors, setErrors] = useState<InputErrors>({});
-  const profileRaw = useSyncExternalStore(subscribeProfile, readProfileRaw, () => null);
-  const [sessionProfile, setSessionProfile] = useState<StartupProfile | null>(null);
-  const profile = useMemo(() => sessionProfile ?? parseProfile(profileRaw), [sessionProfile, profileRaw]);
+  const [profile, setProfile] = useState<StartupProfile>(DEFAULT_STARTUP_PROFILE);
+  const [profileStatus, setProfileStatus] = useState<ProfileStatus>({ storage: "browser", saved: false, loading: true });
   const { state, run } = useBriefStream();
   const briefRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const [lastRun, setLastRun] = useState<{ investor: string; firm: string } | null>(null);
+
+  // Load the profile: Supabase when it's connected, otherwise this browser.
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/profile")
+      .then((r) => r.json() as Promise<{ profile: StartupProfile; saved: boolean; storage: "supabase" | "none" }>)
+      .then((data) => {
+        if (cancelled) return;
+        if (data.storage === "supabase") {
+          setProfile(sanitizeProfile(data.profile));
+          setProfileStatus({ storage: "supabase", saved: data.saved, loading: false });
+        } else {
+          const local = readLocalProfile();
+          if (local) setProfile(local);
+          setProfileStatus({ storage: "browser", saved: Boolean(local), loading: false });
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        const local = readLocalProfile();
+        if (local) setProfile(local);
+        setProfileStatus({ storage: "browser", saved: Boolean(local), loading: false });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (state.phase === "done") briefRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -83,8 +93,6 @@ export function BriefApp() {
   useEffect(() => {
     document.title = state.phase === "done" ? `${state.brief.investor.name} · Know Thy VC` : "Know Thy VC";
   }, [state]);
-
-  const fit = useMemo(() => (state.phase === "done" ? computeFit(state.brief, profile) : null), [state, profile]);
 
   async function generate(name = investor, company = firm, fresh = false) {
     const fieldErrors = validateInputs(name, company);
@@ -101,24 +109,35 @@ export function BriefApp() {
     void generate(name, company);
   }
 
-  function saveProfile(p: StartupProfile) {
+  async function saveProfile(p: StartupProfile): Promise<boolean> {
     const clean = sanitizeProfile(p);
-    try {
-      localStorage.setItem(PROFILE_KEY, JSON.stringify(clean));
-      setSessionProfile(null);
-      window.dispatchEvent(new Event(PROFILE_EVENT));
-    } catch {
-      // Private mode: the profile still applies for this visit.
-      setSessionProfile(clean);
+    if (profileStatus.storage === "supabase") {
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(clean),
+      }).catch(() => null);
+      if (!res?.ok) {
+        const body = (await res?.json().catch(() => null)) as { error?: string } | null;
+        setProfileStatus({ ...profileStatus, error: body?.error ?? "Couldn't save the profile. Try again." });
+        return false;
+      }
+    } else {
+      writeLocalProfile(clean);
     }
+    setProfile(clean);
+    setProfileStatus({ ...profileStatus, saved: true, error: undefined });
+    return true;
   }
+
+  const isSample = !profileStatus.saved && sameProfile(profile, DEFAULT_STARTUP_PROFILE);
 
   const busy = state.phase === "running";
 
   return (
     <>
       <section className="no-print relative">
-        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 md:py-32 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-40">
+        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 md:py-24 lg:grid-cols-[1.1fr_0.9fr] lg:items-start lg:py-28">
           <div className="min-w-0">
             <Reveal>
               <SectionLabel pulse>Live investor intel</SectionLabel>
@@ -129,27 +148,33 @@ export function BriefApp() {
                 Name and firm in. A sourced investor brief out, in under two minutes.
               </p>
             </Reveal>
-            <Reveal delay={0.1} className="mt-10">
-              <BriefForm
-                investor={investor}
-                firm={firm}
-                errors={errors}
-                busy={busy}
-                onChange={(field, value) => {
-                  if (field === "investor") setInvestor(value);
-                  else setFirm(value);
-                  if (errors[field]) setErrors({ ...errors, [field]: undefined });
-                }}
-                onSubmit={() => void generate()}
-                onPick={pick}
-              />
-              <StartupPanel profile={profile} onSave={saveProfile} />
+            <Reveal delay={0.1} className="mt-10 space-y-8">
+              <div>
+                <StepHeading n="01" title="Your startup" />
+                <StartupCard profile={profile} status={profileStatus} isSample={isSample} disabled={busy} onSave={saveProfile} />
+              </div>
+              <div>
+                <StepHeading n="02" title="Investor to research" />
+                <BriefForm
+                  investor={investor}
+                  firm={firm}
+                  errors={errors}
+                  busy={busy}
+                  onChange={(field, value) => {
+                    if (field === "investor") setInvestor(value);
+                    else setFirm(value);
+                    if (errors[field]) setErrors({ ...errors, [field]: undefined });
+                  }}
+                  onSubmit={() => void generate()}
+                  onPick={pick}
+                />
+              </div>
             </Reveal>
           </div>
 
-          <div ref={progressRef} className="min-w-0 scroll-mt-24">
+          <div ref={progressRef} className="min-w-0 scroll-mt-24 lg:sticky lg:top-24">
             {state.phase === "idle" ? (
-              <div className="hidden lg:block">
+              <div className="hidden lg:block lg:pt-24">
                 <HeroGraphic />
               </div>
             ) : (
@@ -209,33 +234,25 @@ export function BriefApp() {
         </div>
       </section>
 
-      {state.phase === "done" && fit && (
-        <div ref={briefRef} className="mx-auto max-w-6xl scroll-mt-24 space-y-20 px-4 pb-24 sm:px-6 md:space-y-28">
-          <div className="hidden print:block">
-            <p className="font-display text-lg">
-              Know Thy <span className="text-accent">VC</span>
-            </p>
-            <p className="font-mono text-xs">Generated {new Date(state.brief.generatedAt).toLocaleString("en-IN")}</p>
-          </div>
-          <Reveal>
-            <BriefHeader
-              brief={state.brief}
-              cached={state.cached}
-              onCopy={() => navigator.clipboard.writeText(briefToMarkdown(state.brief, fit))}
-              onRegenerate={() => lastRun && void generate(lastRun.investor, lastRun.firm, true)}
-            />
-          </Reveal>
-          <Reveal>
-            <StatsStrip brief={state.brief} durationMs={state.durationMs} fit={fit} />
-          </Reveal>
-          <PortfolioGrid brief={state.brief} />
-          <ThesisSection brief={state.brief} />
-          <ContextList brief={state.brief} />
-          <TalkingPoints brief={state.brief} />
-          <FitCard fit={fit} profile={profile} />
-          <SourcesList brief={state.brief} />
-        </div>
+      {state.phase === "done" && (
+        <BriefView
+          ref={briefRef}
+          brief={state.brief}
+          profile={profile}
+          durationMs={state.durationMs}
+          cached={state.cached}
+          onRegenerate={() => lastRun && void generate(lastRun.investor, lastRun.firm, true)}
+        />
       )}
     </>
+  );
+}
+
+function StepHeading({ n, title }: { n: string; title: string }) {
+  return (
+    <p className="mb-3 flex items-center gap-3">
+      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-signature font-mono text-[11px] text-white">{n}</span>
+      <span className="font-semibold">{title}</span>
+    </p>
   );
 }

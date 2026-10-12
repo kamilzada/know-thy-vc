@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       try {
         // 1. Cache
         if (!fresh) {
-          const cached = await findCachedBrief(investor, firm);
+          const cached = await findCachedBrief(investor, firm, profile);
           if (cached) {
             send({ type: "brief", brief: cached.brief, cached: true, durationMs: cached.duration_ms ?? 0, id: cached.id });
             return;
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
 
         // 7. Persist, then render
         const durationMs = Date.now() - startedAt;
-        const id = await saveBrief({ investor, firm, brief, durationMs });
+        const id = await saveBrief({ investor, firm, profile, brief, durationMs });
         send({ type: "brief", brief, cached: false, durationMs, id: id ?? undefined });
       } catch (err) {
         const e = err instanceof BriefError ? err : toBriefError(err, "The brief pipeline");

@@ -4,10 +4,10 @@ import { Card } from "@/components/ui/Card";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { domainOf } from "@/components/ui/SourceChip";
 import { cn } from "@/lib/cn";
-import type { Brief } from "@/lib/types";
+import type { Brief, StartupProfile } from "@/lib/types";
 
 /** The emotional peak: three openers, the middle one featured and offset. */
-export function TalkingPoints({ brief }: { brief: Brief }) {
+export function TalkingPoints({ brief, profile }: { brief: Brief; profile: StartupProfile }) {
   return (
     <section aria-labelledby="talking-heading" className="relative overflow-hidden rounded-3xl bg-foreground px-6 py-12 text-background md:px-10 md:pb-20">
       <div aria-hidden className="dot-pattern absolute inset-0" />
@@ -17,6 +17,9 @@ export function TalkingPoints({ brief }: { brief: Brief }) {
         <h3 id="talking-heading" className="mt-4 font-display text-3xl md:text-4xl">
           Three things to <span className="gradient-text">say</span>
         </h3>
+        <p className="mt-3 max-w-2xl text-background/70">
+          Written for {profile.name} ({profile.stage}), each tied to something this investor has done or said.
+        </p>
         {brief.talkingPoints.length === 0 ? (
           <p className="mt-6 text-background/70">No talking point could be backed by a source for this investor.</p>
         ) : (

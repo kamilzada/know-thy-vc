@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { formatShortDate } from "@/lib/format";
-import type { Brief, Confidence } from "@/lib/types";
+import type { Brief, Confidence, StartupProfile } from "@/lib/types";
 
 const SECTION_NAMES = { portfolio: "Portfolio", thesis: "Thesis", context: "Context" } as const;
 
@@ -21,19 +21,24 @@ export function ConfidenceBadge({ level, label }: { level: Confidence; label?: s
 export function BriefHeader({
   brief,
   cached,
+  profile,
   onCopy,
   onRegenerate,
 }: {
   brief: Brief;
   cached: boolean;
+  profile: StartupProfile;
   onCopy: () => Promise<void>;
-  onRegenerate: () => void;
+  onRegenerate?: () => void;
 }) {
   const [copied, setCopied] = useState(false);
   const { investor } = brief;
   return (
     <header className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
       <div className="min-w-0">
+        <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+          Prepared for {profile.name} · {profile.stage}
+        </p>
         <h2 className="font-display text-4xl leading-[1.1] md:text-5xl">{investor.name}</h2>
         <p className="mt-2 text-lg text-muted-foreground">
           {[investor.role, investor.firm].filter(Boolean).join(", ")}
@@ -76,9 +81,11 @@ export function BriefHeader({
         <Button variant="secondary" size="sm" onClick={() => window.print()}>
           <Printer aria-hidden className="h-4 w-4" /> Download PDF
         </Button>
-        <Button variant="ghost" size="sm" onClick={onRegenerate}>
-          <RotateCw aria-hidden className="h-4 w-4" /> Regenerate
-        </Button>
+        {onRegenerate && (
+          <Button variant="ghost" size="sm" onClick={onRegenerate}>
+            <RotateCw aria-hidden className="h-4 w-4" /> Regenerate
+          </Button>
+        )}
       </div>
     </header>
   );

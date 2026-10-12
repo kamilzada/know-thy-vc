@@ -42,14 +42,22 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 <Logo />
                 <Wordmark />
               </Link>
-              <a
-                href="https://github.com/kamilzada/know-thy-vc"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono text-xs text-muted-foreground hover:text-foreground"
-              >
-                GitHub
-              </a>
+              <div className="flex items-center gap-1 text-sm">
+                <Link href="/" className="rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                  Generate
+                </Link>
+                <Link href="/history" className="rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                  History
+                </Link>
+                <a
+                  href="https://github.com/kamilzada/know-thy-vc"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hidden rounded-lg px-3 py-2 font-mono text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:inline"
+                >
+                  GitHub
+                </a>
+              </div>
             </nav>
           </header>
           <main className="flex-1">{children}</main>
