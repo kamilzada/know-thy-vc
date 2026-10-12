@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1260" viewBox="0 0 2000 1260">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/></marker><marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0052FF"/></marker><marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#DC2626"/></marker></defs>
+<rect width="2000" height="1260" fill="#F4F6FA"/>
+<text x="78" y="82" font-family="Menlo, 'SF Mono', monospace" font-size="15" font-weight="700" fill="#0052FF" letter-spacing="3" text-anchor="start">KNOW THY VC · MESA C4 · PROBLEM STATEMENT 1</text>
+<text x="76" y="152" font-family="Georgia, 'Times New Roman', serif" font-size="58" font-weight="400" fill="#0F172A" letter-spacing="0" text-anchor="start">Pre-meeting investor brief</text>
+<rect x="1080" y="95" width="20" height="20" rx="5" fill="#FFFFFF" stroke="#0052FF" stroke-width="3"/>
+<text x="1112" y="112" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">our app on Vercel</text>
+<rect x="1290" y="95" width="20" height="20" rx="5" fill="#0F172A"/>
+<text x="1322" y="112" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">person</text>
+<rect x="1410" y="95" width="20" height="20" rx="5" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+<text x="1442" y="112" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">outside service</text>
+<rect x="1595" y="95" width="20" height="20" rx="5" fill="#EAF0FF" stroke="#BFD0FF" stroke-width="2"/>
+<text x="1627" y="112" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">database</text>
+<path d="M1725,105 L1765,105" fill="none" stroke="#DC2626" stroke-width="2.5" marker-end="url(#r)"/>
+<text x="1777" y="112" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">stops early</text>
+<rect x="56" y="196" width="1888" height="300" rx="22" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+<text x="88" y="236" font-family="Menlo, 'SF Mono', monospace" font-size="15" font-weight="700" fill="#0052FF" letter-spacing="2.5" text-anchor="start">1 · ASK</text>
+<rect x="110" y="290" width="260" height="112" rx="16" fill="#0F172A"/>
+<text x="140" y="334" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="600" fill="#FFFFFF" letter-spacing="0" text-anchor="start">Priya</text>
+<text x="140" y="370" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#CBD5E1" letter-spacing="0" text-anchor="start">founder, meeting a VC</text>
+<path d="M370,346 L462,346" fill="none" stroke="#94A3B8" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="470" y="262" width="340" height="170" rx="16" fill="#FFFFFF" stroke="#0052FF" stroke-width="3"/>
+<text x="500" y="306" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="600" fill="#0F172A" letter-spacing="0" text-anchor="start">Web page</text>
+<text x="500" y="342" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">investor name + firm</text>
+<text x="500" y="370" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">her startup profile</text>
+<text x="500" y="398" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">live progress + timer</text>
+<path d="M810,346 L892,346" fill="none" stroke="#0052FF" stroke-width="2.5" marker-end="url(#b)"/>
+<rect x="900" y="276" width="360" height="140" rx="16" fill="#FFFFFF" stroke="#0052FF" stroke-width="3"/>
+<text x="930" y="320" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="600" fill="#0F172A" letter-spacing="0" text-anchor="start">Brief API</text>
+<text x="930" y="356" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">runs every step below</text>
+<text x="930" y="384" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">streams progress back</text>
+<path d="M1260,346 L1392,346" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#a)"/>
+<text x="1326" y="330" font-family="Menlo, 'SF Mono', monospace" font-size="15" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="middle">cached?</text>
+<rect x="1400" y="280" width="500" height="132" rx="16" fill="#EAF0FF" stroke="#BFD0FF" stroke-width="2"/>
+<text x="1430" y="324" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="600" fill="#0F172A" letter-spacing="0" text-anchor="start">Supabase</text>
+<text x="1430" y="360" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">saved briefs · 24-hour cache</text>
+<text x="1430" y="388" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">startup profile · History page</text>
+<rect x="56" y="526" width="1888" height="360" rx="22" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+<text x="88" y="566" font-family="Menlo, 'SF Mono', monospace" font-size="15" font-weight="700" fill="#0052FF" letter-spacing="2.5" text-anchor="start">2 · RESEARCH LIVE</text>
+<path d="M1080,416 L1080,570" fill="none" stroke="#0052FF" stroke-width="2.5" marker-end="url(#b)"/>
+<rect x="900" y="578" width="360" height="150" rx="16" fill="#FFFFFF" stroke="#0052FF" stroke-width="3"/>
+<text x="930" y="622" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="600" fill="#0F172A" letter-spacing="0" text-anchor="start">Confirm the investor</text>
+<text x="930" y="658" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">Tavily search + Gemini Flash</text>
+<text x="930" y="686" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">right person, right firm?</text>
+<path d="M900,653 L818,653" fill="none" stroke="#DC2626" stroke-width="2.5" marker-end="url(#r)"/>
+<rect x="470" y="590" width="340" height="126" rx="16" fill="#FFFFFF" stroke="#FCA5A5" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="500" y="634" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="600" fill="#DC2626" letter-spacing="0" text-anchor="start">Can&#x27;t confirm</text>
+<text x="500" y="670" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">stops and shows</text>
+<text x="500" y="698" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">“Did you mean…”</text>
+<text x="1400" y="560" font-family="Menlo, 'SF Mono', monospace" font-size="14" font-weight="600" fill="#64748B" letter-spacing="1.5" text-anchor="start">ALL FOUR AT ONCE · ONE CAN FAIL SAFELY</text>
+<rect x="1400" y="576" width="500" height="64" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+<text x="1428" y="616.0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="600" fill="#0F172A" letter-spacing="0" text-anchor="start">Tavily · Portfolio</text>
+<text x="1670" y="615.0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">deals in the last 90 days</text>
+<path d="M1260,653 C1330,653 1320,608 1392,608" fill="none" stroke="#94A3B8" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="1400" y="652" width="500" height="64" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+<text x="1428" y="692.0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="600" fill="#0F172A" letter-spacing="0" text-anchor="start">Tavily · Thesis</text>
+<text x="1670" y="691.0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">interviews and posts</text>
+<path d="M1260,653 C1330,653 1320,684 1392,684" fill="none" stroke="#94A3B8" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="1400" y="728" width="500" height="64" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+<text x="1428" y="768.0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="600" fill="#0F172A" letter-spacing="0" text-anchor="start">Tavily · Context</text>
+<text x="1670" y="767.0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">red flags, fund news</text>
+<path d="M1260,653 C1330,653 1320,760 1392,760" fill="none" stroke="#94A3B8" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="1400" y="804" width="500" height="64" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+<text x="1428" y="844.0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="600" fill="#0F172A" letter-spacing="0" text-anchor="start">Exa web search</text>
+<text x="1670" y="843.0" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">overview, via OpenRouter</text>
+<path d="M1260,653 C1330,653 1320,836 1392,836" fill="none" stroke="#94A3B8" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="56" y="916" width="1888" height="270" rx="22" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+<text x="88" y="956" font-family="Menlo, 'SF Mono', monospace" font-size="15" font-weight="700" fill="#0052FF" letter-spacing="2.5" text-anchor="start">3 · WRITE, CHECK, SHOW</text>
+<path d="M1650,868 L1650,900 L640,900 L640,972" fill="none" stroke="#94A3B8" stroke-width="2.5" marker-end="url(#a)"/>
+<text x="1000" y="893" font-family="Menlo, 'SF Mono', monospace" font-size="15" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">every source, numbered S1, S2, S3…</text>
+<rect x="470" y="980" width="340" height="160" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+<text x="500" y="1024" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="600" fill="#0F172A" letter-spacing="0" text-anchor="start">Gemini Flash writes</text>
+<text x="500" y="1060" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">one AI call, JSON format</text>
+<text x="500" y="1088" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">must cite a source number</text>
+<text x="500" y="1116" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">for every claim</text>
+<path d="M810,1060 L892,1060" fill="none" stroke="#0052FF" stroke-width="2.5" marker-end="url(#b)"/>
+<rect x="900" y="975" width="360" height="170" rx="16" fill="#FFFFFF" stroke="#0052FF" stroke-width="3"/>
+<text x="930" y="1019" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="600" fill="#0F172A" letter-spacing="0" text-anchor="start">Validator · plain code</text>
+<text x="930" y="1055" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">drops uncited claims</text>
+<text x="930" y="1083" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">drops quotes not in source</text>
+<text x="930" y="1111" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">90-day rule · confidence</text>
+<path d="M1260,1060 L1392,1060" fill="none" stroke="#0052FF" stroke-width="2.5" marker-end="url(#b)"/>
+<rect x="1400" y="980" width="500" height="160" rx="16" fill="#FFFFFF" stroke="#0052FF" stroke-width="3"/>
+<text x="1430" y="1024" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="600" fill="#0F172A" letter-spacing="0" text-anchor="start">Brief + fit score</text>
+<text x="1430" y="1060" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">deals · thesis · red flags · 3 openers</text>
+<text x="1430" y="1088" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">every claim linked · about 40 s</text>
+<text x="1430" y="1116" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">saved to Supabase</text>
+<text x="78" y="1228" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="400" fill="#64748B" letter-spacing="0" text-anchor="start">Next.js on Vercel · Gemini Flash is the only AI model · deployed from GitHub · know-thy-vc.vercel.app</text>
+</svg>
