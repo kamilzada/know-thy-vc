@@ -4,6 +4,7 @@ import { Check, Copy, ExternalLink, Printer, RotateCw } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { InvestorAvatar } from "./InvestorAvatar";
 import { formatShortDate } from "@/lib/format";
 import type { Brief, Confidence, StartupProfile } from "@/lib/types";
 
@@ -35,6 +36,8 @@ export function BriefHeader({
   const { investor } = brief;
   return (
     <header className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <div className="flex min-w-0 items-start gap-5 md:gap-6">
+      <InvestorAvatar name={investor.name} firm={investor.firm} firmUrl={investor.firmUrl} />
       <div className="min-w-0">
         <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
           Prepared for {profile.name} · {profile.stage}
@@ -64,6 +67,7 @@ export function BriefHeader({
             <ConfidenceBadge key={k} level={brief.confidence[k]} label={SECTION_NAMES[k]} />
           ))}
         </div>
+      </div>
       </div>
       <div className="no-print flex flex-wrap gap-2">
         <Button

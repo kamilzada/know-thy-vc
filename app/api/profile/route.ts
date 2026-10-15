@@ -8,6 +8,9 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
+  if (process.env.VERCEL_ENV === "preview") {
+    return Response.json({ error: "This is a preview link, so the profile can't be changed here." }, { status: 403 });
+  }
   if (!isSupabaseConfigured()) {
     return Response.json({ error: "Supabase isn't configured, so the profile can only be kept in this browser." }, { status: 503 });
   }

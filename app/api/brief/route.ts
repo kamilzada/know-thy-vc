@@ -125,7 +125,8 @@ export async function POST(request: Request) {
 
         // 7. Persist, then render
         const durationMs = Date.now() - startedAt;
-        const id = await saveBrief({ investor, firm, profile, brief, durationMs });
+        // Preview deployments share the production database, so they never write to it.
+        const id = process.env.VERCEL_ENV === "preview" ? null : await saveBrief({ investor, firm, profile, brief, durationMs });
         send({ type: "brief", brief, cached: false, durationMs, id: id ?? undefined });
       } catch (err) {
         const e = err instanceof BriefError ? err : toBriefError(err, "The brief pipeline");
